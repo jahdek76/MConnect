@@ -1,16 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Moon, Sun, Eye, EyeOff } from "lucide-react";
-import mafaLogo from "../assets/mafa-logo.png";
+import mafaLogo from "@/assets/mafa-logo.png";
 
-// Replace these with your components or basic HTML if needed
-import { Button } from "../components/Button";
-import { Input } from "../components/Input";
-import { Label } from "../components/Label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/Card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/Tabs";
-import { useTheme } from "../hooks/useTheme";
-import { useToast } from "../hooks/useToast";
+// ✅ UI components (in src/components/ui)
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/Card";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/Tabs.jsx";
+
+// ✅ Hooks (in src/hooks)
+import { useTheme } from "@/hooks/useTheme";
+import { useToast } from "@/hooks/useToast";
 
 export default function Auth() {
   const navigate = useNavigate();
