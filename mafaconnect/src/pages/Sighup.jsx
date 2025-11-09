@@ -19,8 +19,11 @@ import { CardTitle } from "@/components/ui/Card";
 import { CardDescription } from "@/components/ui/Card";
 // import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/Tabs";
 import { Tabs,TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
-import { useTheme } from "../hooks/useTheme";
-import { useToast } from "../hooks/useToast";
+import { useTheme } from "@/hooks/useTheme";
+import { useToast } from "@/hooks/useToast";
+// import { useTheme } from "../hooks/useTheme";
+// import { useToast } from "../hooks/useToast";
+
 
 export default function Auth() {
   const navigate = useNavigate();
