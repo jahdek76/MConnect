@@ -11,14 +11,14 @@ import mafaLogo from "../assets/mafa-logo.png";
 //   CardTitle,
 //   CardDescription,
 // } from "@/components/ui/Card";
-import { Card } from "@/components/ui/Card";
-import { CardContent } from "@/components/ui/Card";
-import { CardHeader } from "@/components/ui/Card";
-import { CardDescription } from "@/components/ui/Card";
+import { Card } from "@/components/uisbefore/Card";
+import { CardContent } from "@/components/uisbefore/Card";
+import { CardHeader } from "@/components/uisbefore/Card";
+import { CardDescription } from "@/components/uisbefore/Card";
 // import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/Card";
 // import { Input } from "../components/Input";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/uisbefore/Input";
+import { Button } from "@/components/uisbefore/Button";
 // import { Badge } from "lucide-react";
 // import { Button } from "../components/Button";
 // import { Badge } from "../components/Badge";

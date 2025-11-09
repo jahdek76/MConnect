@@ -1,0 +1,43 @@
+const express = require("express");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
+const { sequelize } = require("./db.js"); // adjust path if db.js is inside config/
+
+// const authRoutes = require("./routes/auth");
+// const kycRoutes = require("./routes/kyc");
+const adminRoutes = require("./routes/admin");
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// ✅ Middleware
+app.use(express.json());
+app.use(cookieParser());
+
+// ✅ Base routes
+// app.use("/api/auth", authRoutes);
+// app.use("/api/kyc", kycRoutes);
+app.use("/api/admin", adminRoutes);
+
+// ✅ Health check
+app.get("/", (req, res) => {
+  res.send("🚀 MafaConnect Backend API is running...");
+});
+
+// ✅ DB connection + start server
+(async () => {
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
+    console.log("✅ Connected to MySQL database");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+  }
+})();
+
