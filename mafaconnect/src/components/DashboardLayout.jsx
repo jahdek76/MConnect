@@ -37,7 +37,9 @@ import { useConversations } from "@/hooks/useConversations";
 import { LowStockAlert } from "./LowStockAlert";
 import { ShoppingCartSidebar } from "./ShoppingCartSidebar";
 import { NotificationBell } from "./NotificationBell";
-import { MobileBottomNav } from "./MobileBottomNav";
+// import { MobileBottomNav } from "./MobileBottomNav";
+
+import MobileBottomNav from "./MobileBottomNav";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },

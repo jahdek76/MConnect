@@ -1,12 +1,10 @@
-// import React from "react";
-// import { Toaster } from "./components/ui/Toaster";
+import React from "react";
 import Toaster from "@/components/ui/Toaster";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 // import { DashboardLayout } from "./components/DashboardLayout";
 import { InstallPromptBanner } from "./components/InstallPromptBanner";
-// import { ProtectedRoute } from "./components/ProtectedRoute";
 // import { CustomerProtectedRoute } from "./components/CustomerProtectedRoute";
 // import { AuthProtectedRoute } from "./components/AuthProtectedRoute";
 
@@ -43,6 +41,7 @@ import NotFound from "./pages/NotFound";
 // import KYCOnboarding from "./pages/KYCOnboarding";
 import Install from "./pages/Install";
 import CustomerPortal from "./pages/CustomerPortal";
+import { DashboardLayout } from "./components/DashboardLayout";
 
 const queryClient = new QueryClient();
 
@@ -53,8 +52,8 @@ function App() {
         <InstallPromptBanner />
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/portal" element={<CustomerPortal />} />
-          <Route path="/install" element={<Install />} />
+          {/* <Route path="/portal" element={<CustomerPortal />} /> */}
+          {/* <Route path="/install" element={<Install />} /> */}
 
           {/* Customer Routes */}
           {/* <Route
@@ -354,24 +353,46 @@ function App() {
 
 export default App;
 
+// import { Toaster } from "./components/ui/Toaster";
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from "react";
 // import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 // import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// // ✅ Pages and Components
 // import Auth from "./pages/Sighup";
-// import { InstallPromptBanner } from "./components/InstallPromptBanner";
 // import CustomerPortal from "./pages/CustomerPortal";
-// // import DashboardLayout from "./components/layouts/DashboardLayout";
-// // import Admin from "./pages/Admin";
+// import Admin from "./pages/Admin";
+// import { DashboardLayout } from "./components/DashboardLayout";
 // import ProtectedRoute from "./components/ProtectedRoute";
+// import { InstallPromptBanner } from "./components/InstallPromptBanner";
+// import Toaster from "./components/ui/Toaster"; // ✅ default import
 
 // const queryClient = new QueryClient();
 
 // function App() {
 //   return (
 //     <QueryClientProvider client={queryClient}>
+//       <InstallPromptBanner />
 //       <Router>
-//         {/* ✅ Global components */}
-//         <InstallPromptBanner />
+//         {/* ✅ Global components outside Routes */}
+        
+//         <Toaster />
 
 //         <Routes>
 //           {/* 🔁 Redirect "/" to "/auth" */}
@@ -380,7 +401,7 @@ export default App;
 //           {/* Public routes */}
 //           <Route path="/auth" element={<Auth />} />
 
-//           {/* Protected routes */}
+//           {/* Protected user route */}
 //           <Route
 //             path="/portal"
 //             element={
@@ -390,8 +411,8 @@ export default App;
 //             }
 //           />
 
-//           {/* Admin-only route */}
-//           {/* <Route
+//           {/* Protected admin route */}
+//           <Route
 //             path="/admin"
 //             element={
 //               <ProtectedRoute requireAdmin>
@@ -400,7 +421,7 @@ export default App;
 //                 </DashboardLayout>
 //               </ProtectedRoute>
 //             }
-//           /> */}
+//           />
 //         </Routes>
 //       </Router>
 //     </QueryClientProvider>

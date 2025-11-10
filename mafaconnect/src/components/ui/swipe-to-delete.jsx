@@ -1,4 +1,4 @@
-import *"react";
+import * as React from "react";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hapticFeedback } from "@/lib/haptics";
@@ -12,7 +12,7 @@ export function SwipeToDelete({
   deleteText = "Delete",
   deleteIcon = <Trash2 className="h-5 w-5" />,
   className,
-}: SwipeToDeleteProps) {
+}) {
   const isMobile = useIsMobile();
   const [swipeOffset, setSwipeOffset] = React.useState(0);
   const [isSwiping, setIsSwiping] = React.useState(false);
@@ -22,7 +22,7 @@ export function SwipeToDelete({
   const startTime = React.useRef(0);
   const hasTriggeredHaptic = React.useRef(false);
 
-  // Reset function
+  // Reset swipe state
   const reset = () => {
     setSwipeOffset(0);
     setIsSwiping(false);
@@ -32,12 +32,11 @@ export function SwipeToDelete({
   // Handle touch start
   const handleTouchStart = (e) => {
     if (disabled || !isMobile || isDeleting) return;
-    
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     startTime.current = Date.now();
     hasTriggeredHaptic.current = false;
-    hapticFeedback('light');
+    hapticFeedback("light");
   };
 
   // Handle touch move
@@ -49,22 +48,19 @@ export function SwipeToDelete({
     const diffX = currentX - touchStartX.current;
     const diffY = currentY - touchStartY.current;
 
-    // Only swipe if more horizontal than vertical
+    // Only allow horizontal swipe to the left
     if (Math.abs(diffX) > Math.abs(diffY) && diffX < 0) {
-      if (!isSwiping) {
-        setIsSwiping(true);
-      }
-      
-      // Prevent scrolling when swiping
-      e.preventDefault();
-      
-      // Add resistance after threshold
+      if (!isSwiping) setIsSwiping(true);
+
+      e.preventDefault(); // Prevent vertical scroll during swipe
+
+      // Apply resistance beyond threshold
       const resistance = Math.abs(diffX) > deleteThreshold ? 0.3 : 1;
       setSwipeOffset(diffX * resistance);
 
-      // Haptic feedback when reaching threshold
+      // Trigger haptic feedback at threshold
       if (Math.abs(diffX) >= deleteThreshold && !hasTriggeredHaptic.current) {
-        hapticFeedback('medium');
+        hapticFeedback("medium");
         hasTriggeredHaptic.current = true;
       }
     }
@@ -75,28 +71,28 @@ export function SwipeToDelete({
     if (disabled || !isMobile || isDeleting) return;
 
     const velocity = swipeOffset / (Date.now() - startTime.current);
-    const shouldDelete = Math.abs(swipeOffset) >= deleteThreshold || Math.abs(velocity) > 0.5;
+    const shouldDelete =
+      Math.abs(swipeOffset) >= deleteThreshold || Math.abs(velocity) > 0.5;
 
     if (shouldDelete) {
-      // Animate delete
+      // Animate delete swipe
       setIsDeleting(true);
       setSwipeOffset(-400); // Swipe off screen
-      hapticFeedback('heavy');
-      
+      hapticFeedback("heavy");
+
       setTimeout(() => {
-        onDelete();
+        if (typeof onDelete === "function") onDelete();
         reset();
         setIsDeleting(false);
       }, 300);
     } else {
-      // Spring back
-      reset();
+      reset(); // Return to normal
     }
 
     setIsSwiping(false);
   };
 
-  // Don't apply swipe on desktop
+  // No swipe behavior for desktop
   if (!isMobile) {
     return <div className={className}>{children}</div>;
   }

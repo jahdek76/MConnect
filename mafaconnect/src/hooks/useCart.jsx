@@ -1,101 +1,50 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "./useAuth";
+import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api"; // your Node.js API helpers
 
 export function useCart() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  // Fetch cart with items
+  // 🛒 Fetch cart and its items from Node backend
   const { data: cart, isLoading } = useQuery({
     queryKey: ["cart", user?.id],
     queryFn: async () => {
       if (!user) return null;
 
-      // Get or create cart
-      let { data: cartData, error: cartError } = await supabase
-        .from("carts")
-        .select("*")
-        .eq("customer_id", user.id)
-        .single();
+      const res = await apiGet(`/api/cart/${user.id}`);
+      if (!res || res.error) throw new Error(res?.error || "Failed to fetch cart");
 
-      if (cartError && cartError.code === "PGRST116") {
-        // Cart doesn't exist, create it
-        const { data: newCart, error: createError } = await supabase
-          .from("carts")
-          .insert({ customer_id: user.id })
-          .select()
-          .single();
-
-        if (createError) throw createError;
-        cartData = newCart;
-      } else if (cartError) {
-        throw cartError;
-      }
-
-      // Fetch cart items with product details
-      const { data: items, error: itemsError } = await supabase
-        .from("cart_items")
-        .select(`
-          *,
-          product:products (
-            id,
-            name,
-            sku,
-            sale_price,
-            stock_qty,
-            active
-          )
-        `)
-        .eq("cart_id", cartData.id);
-
-      if (itemsError) throw itemsError;
-
-      return {
-        ...cartData,
-        items: items || [],
-      };
+      return res.data;
     },
     enabled: !!user,
   });
 
-  // Calculate cart totals
-  const itemCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-  const cartTotal = cart?.items?.reduce(
-    (sum, item) => sum + (item.product?.sale_price || 0) * item.quantity,
-    0
-  ) || 0;
+  // 🔢 Cart summary
+  const itemCount =
+    cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
-  // Add to cart mutation
+  const cartTotal =
+    cart?.items?.reduce(
+      (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+      0
+    ) || 0;
+
+  // ➕ Add to cart
   const addToCart = useMutation({
-    mutationFn: async ({ productId, quantity }: { productId; quantity: number }) => {
-      if (!user || !cart) throw new Error("No user or cart found");
+    mutationFn: async ({ productId, quantity }) => {
+      if (!user) throw new Error("User not logged in");
 
-      // Check if item already exists
-      const existingItem = cart.items.find((item) => item.product_id === productId);
+      const res = await apiPost(`/api/cart/add`, {
+        userId: user.id,
+        productId,
+        quantity,
+      });
 
-      if (existingItem) {
-        // Update quantity
-        const { error } = await supabase
-          .from("cart_items")
-          .update({ quantity: existingItem.quantity + quantity })
-          .eq("id", existingItem.id);
-
-        if (error) throw error;
-      } else {
-        // Add new item
-        const { error } = await supabase
-          .from("cart_items")
-          .insert({
-            cart_id: cart.id,
-            product_id: productId,
-            quantity,
-          });
-
-        if (error) throw error;
-      }
+      if (res.error) throw new Error(res.error);
+      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -113,21 +62,14 @@ export function useCart() {
     },
   });
 
-  // Update quantity mutation
+  // 🔄 Update item quantity
   const updateQuantity = useMutation({
-    mutationFn: async ({ itemId, quantity }: { itemId; quantity: number }) => {
-      if (quantity <= 0) {
-        // Remove item if quantity is 0 or less
-        const { error } = await supabase.from("cart_items").delete().eq("id", itemId);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("cart_items")
-          .update({ quantity })
-          .eq("id", itemId);
-
-        if (error) throw error;
-      }
+    mutationFn: async ({ itemId, quantity }) => {
+      const res = await apiPut(`/api/cart/update`, {
+        itemId,
+        quantity,
+      });
+      if (res.error) throw new Error(res.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -141,11 +83,11 @@ export function useCart() {
     },
   });
 
-  // Remove from cart mutation
+  // ❌ Remove item
   const removeFromCart = useMutation({
     mutationFn: async (itemId) => {
-      const { error } = await supabase.from("cart_items").delete().eq("id", itemId);
-      if (error) throw error;
+      const res = await apiDelete(`/api/cart/item/${itemId}`);
+      if (res.error) throw new Error(res.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -163,23 +105,21 @@ export function useCart() {
     },
   });
 
-  // Clear cart mutation
+  // 🧹 Clear all items
   const clearCart = useMutation({
     mutationFn: async () => {
-      if (!cart) throw new Error("No cart found");
+      if (!user) throw new Error("User not logged in");
 
-      const { error } = await supabase
-        .from("cart_items")
-        .delete()
-        .eq("cart_id", cart.id);
-
-      if (error) throw error;
+      const res = await apiDelete(`/api/cart/clear/${user.id}`);
+      if (res.error) throw new Error(res.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      // Invalidate products and locations to refresh stock
       queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["product-locations"] });
+      toast({
+        title: "Cart cleared",
+        description: "All items have been removed from your cart.",
+      });
     },
     onError: (error) => {
       toast({
