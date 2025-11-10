@@ -331,7 +331,7 @@ function App() {
               </ProtectedRoute>
             }
           /> */}
-          {/* <Route
+          <Route
             path="/admin"
             element={
               <ProtectedRoute requireAdmin>
@@ -340,7 +340,7 @@ function App() {
                 </DashboardLayout>
               </ProtectedRoute>
             }
-          /> */}
+          />
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
