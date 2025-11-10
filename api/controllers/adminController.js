@@ -41,6 +41,44 @@ exports.adminLogin = async (req, res) => {
   }
 };
 
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    const user = await User.findByPk(decoded.id, {
+      attributes: ["id", "name", "account_number", "email", "role", "kyc_status", "is_active"],
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ user });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+exports.logout = async (req, res) => {
+  try {
+    // Optional: verify token before logout
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+    const token = authHeader.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token provided" });
+
+    // In production, you could blacklist this token
+    // For now, just respond OK
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error during logout" });
+  }
+};
+
 // Admin Dashboard Data
 exports.getDashboard = async (req, res) => {
   try {

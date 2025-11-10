@@ -27,7 +27,7 @@ export default function Auth() {
   const [customerType, setCustomerType] = useState("individual");
   const [resetEmail, setResetEmail] = useState("");
 
-  const API_URL = import.meta.env.VITE_HOME_OO || "http://localhost:8000/api";
+  const API_URL =  import.meta.env.VITE_HOME_OO 
 
   // ✅ LOGIN
   const handleLogin = async (e) => {
@@ -35,8 +35,8 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_URL}/admin/login`, {
-        email: loginEmail,
+      const res = await axios.post(`${API_URL}/login`, {
+        account_number: loginEmail,
         password: loginPassword,
       });
 
@@ -46,7 +46,7 @@ export default function Auth() {
           title: "✅ Login Successful",
           description: `Welcome back, ${res.data.admin?.name || "User"}`,
         });
-        navigate("/portal"); // redirect to dashboard or portal
+        navigate("/admin"); // redirect to dashboard or portal
       } else {
         throw new Error("Invalid response from server");
       }
@@ -67,7 +67,7 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_URL}/auth/register`, {
+      const res = await axios.post(`${API_URL}/register`, {
         name: signupFullName,
         email: signupEmail,
         phone: signupPhone,
@@ -157,8 +157,8 @@ export default function Auth() {
                   <Label htmlFor="login-email">Email</Label>
                   <Input
                     id="login-email"
-                    type="email"
-                    placeholder="you@email.com"
+                    type="text"
+                    placeholder="0000001 or you@email.com  "
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required

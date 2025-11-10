@@ -8,15 +8,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
  * VITE_HOME_OO="https://your-backend-domain.com/api"
  */
 const API_URL = import.meta.env.VITE_HOME_OO || "http://localhost:8000/api";
-
 /**
  * Fetch the currently authenticated user
  */
 async function fetchCurrentUser() {
   const token = localStorage.getItem("ACCESS_TOKEN");
   if (!token) throw new Error("No token");
-
-  const res = await fetch(`${API_URL}/auth/me`, {
+  const res = await fetch(`${API_URL}/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -30,7 +28,7 @@ async function fetchCurrentUser() {
 async function logoutRequest() {
   const token = localStorage.getItem("ACCESS_TOKEN");
   if (token) {
-    await fetch(`${API_URL}/auth/logout`, {
+    await fetch(`${API_URL}/logout`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });

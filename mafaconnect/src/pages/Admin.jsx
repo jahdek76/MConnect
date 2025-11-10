@@ -40,11 +40,8 @@ export default function Admin() {
     setIsBackfilling(true);
     try {
       const response = await apiPost("/api/admin/backfill-invoices");
-
       if (response.error) throw new Error(response.error);
-
       const results = response.data?.results || [];
-
       toast.success(`Successfully processed ${results.length} orders`, {
         description: results
           .map((r) =>

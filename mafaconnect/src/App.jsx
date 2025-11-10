@@ -52,8 +52,8 @@ function App() {
         <InstallPromptBanner />
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          {/* <Route path="/portal" element={<CustomerPortal />} /> */}
-          {/* <Route path="/install" element={<Install />} /> */}
+          <Route path="/portal" element={<CustomerPortal />} />
+          <Route path="/install" element={<Install />} />
 
           {/* Customer Routes */}
           {/* <Route

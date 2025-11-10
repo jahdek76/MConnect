@@ -1,15 +1,19 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const { sequelize } = require("./db.js"); // adjust path if db.js is inside config/
-
 // const authRoutes = require("./routes/auth");
 // const kycRoutes = require("./routes/kyc");
 const adminRoutes = require("./routes/admin");
-
 dotenv.config();
-
 const app = express();
+// app.use(cors({ origin: "*", credentials: false }));
+app.use(cors({
+  origin: "http://localhost:8081",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
 const PORT = process.env.PORT || 8000;
 
 // ✅ Middleware
@@ -30,7 +34,8 @@ app.get("/", (req, res) => {
 (async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
+    await sequelize.sync(); // or { force: fal
     console.log("✅ Connected to MySQL database");
 
     app.listen(PORT, () => {

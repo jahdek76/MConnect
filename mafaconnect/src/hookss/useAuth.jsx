@@ -1,75 +1,107 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+/**
+ * API Base URL
+ * Make sure your .env file has:
+ * VITE_HOME_OO="https://your-backend-domain.com/api"
+ */
+const API_URL = import.meta.env.VITE_HOME_OO || "http://localhost:8000/api";
+/**
+ * Fetch the currently authenticated user
+ */
+async function fetchCurrentUser() {
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  if (!token) throw new Error("No token");
+  const res = await fetch(`${API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) throw new Error("Unauthorized");
+  return res.json();
+}
+
+/**
+ * Logout request
+ */
+async function logoutRequest() {
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  if (token) {
+    await fetch(`${API_URL}/logout`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  localStorage.removeItem("ACCESS_TOKEN");
+}
+
+/**
+ * ✅ Main useAuth Hook
+ * Handles user session, role checks, and logout
+ */
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [roles, setRoles] = useState([]);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [loading, setLoading] = React.useState(true);
 
-  const API_BASE = import.meta.env.VITE_HOME_OO || "https://your-backend.com/api";
+  // Fetch current user using React Query
+  const {
+    data: userData,
+    isLoading: userLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["authUser"],
+    queryFn: fetchCurrentUser,
+    retry: false,
+    enabled: !!localStorage.getItem("ACCESS_TOKEN"),
+  });
 
-  // ✅ Fetch user info (based on saved token)
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("ACCESS_TOKEN");
-      if (!token) {
-        navigate("/auth");
-        return;
-      }
-
-      const res = await fetch(`${API_BASE}/auth/me`, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        localStorage.removeItem("ACCESS_TOKEN");
-        navigate("/auth");
-        return;
-      }
-
-      const data = await res.json();
-      setUser(data.user || data);
-      setRoles(data.roles || []);
-    } catch (err) {
-      console.error("Error fetching user:", err);
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: logoutRequest,
+    onSuccess: () => {
+      queryClient.removeQueries(["authUser"]);
       localStorage.removeItem("ACCESS_TOKEN");
       navigate("/auth");
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  React.useEffect(() => {
+    if (!userLoading) setLoading(false);
+  }, [userLoading]);
+
+  const signOut = async () => {
+    await logoutMutation.mutateAsync();
   };
 
-  // ✅ Handle logout
-  const signOut = () => {
-    localStorage.removeItem("ACCESS_TOKEN");
-    setUser(null);
-    navigate("/auth");
-  };
+  // Extract user + roles from backend
+  const user = userData?.user || userData?.admin || null;
+  const roles =
+    userData?.roles ||
+    (user?.role ? [user.role] : []); // handle single-role users too
 
-  // ✅ Role helpers
+  // Role helpers
   const hasRole = (role) => roles.includes(role);
   const isAdmin = hasRole("admin");
   const isManager = hasRole("manager") || isAdmin;
-  const isStaff = roles.some((r) =>
-    ["admin", "manager", "sales_agent"].includes(r)
-  );
-
-  // ✅ Run on mount
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const isStaff = roles.some((r) => ["admin", "manager", "sales_agent"].includes(r));
 
   return {
     user,
+    session: userData,
     loading,
-    roles,
     signOut,
+    roles,
     hasRole,
     isAdmin,
     isManager,
     isStaff,
+    refetch,
+    isError,
   };
 }
+
+

@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 export function useConversations() {
   const { user, isStaff } = useAuth();
   const queryClient = useQueryClient();
-  const API_BASE = import.meta.env.VITE_HOME_OO || "https://to-backendapi-v1.onrender.com";
+  const API_BASE = import.meta.env.VITE_HOME_OO || "http://localhost:8000/api";
 
   // ✅ Fetch conversations
   const { data: conversations, isLoading } = useQuery({
@@ -15,8 +15,8 @@ export function useConversations() {
       if (!user) return [];
 
       const endpoint = isStaff
-        ? `${API_BASE}/api/conversations`
-        : `${API_BASE}/api/conversations/customer/${user.id}`;
+        ? `${API_BASE}/conversations`
+        : `${API_BASE}/conversations/customer/${user.id}`;
 
       const res = await fetch(endpoint, {
         headers: {
