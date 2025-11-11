@@ -3,11 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations().then((regs) => {
     for (const reg of regs) reg.unregister();
@@ -15,3 +11,10 @@ if ("serviceWorker" in navigator) {
   caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
   console.log("🧹 Service Worker cleared & disabled for dev mode");
 }
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+

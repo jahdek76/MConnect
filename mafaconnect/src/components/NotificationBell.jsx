@@ -13,7 +13,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/uimain/scroll-area";
-import { useAuth } from "@/hookss/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 export function NotificationBell() {
   const { user } = useAuth();

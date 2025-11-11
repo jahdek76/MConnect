@@ -10,7 +10,7 @@ const {
 const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 
 router.post("/login", adminLogin);
-router.get("/me", authenticate, requireRole("admin"), getCurrentUser);
+router.get("/auth/me", authenticate, requireRole("admin"), getCurrentUser);
 router.post("/refresh", refreshToken);
 router.post("/logout", logout);
 // Only admins can access dashboard

@@ -2,11 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-/**
- * API Base URL
- */
-const API_URL = import.meta.env.VITE_HOME_OO;
+const API_URL = import.meta.env.VITE_HOME_OO; // e.g. http://localhost:8000/api
 
+// ✅ Fetch the current user
 async function fetchCurrentUser() {
   const token = localStorage.getItem("ACCESS_TOKEN");
   if (!token) throw new Error("No token");
@@ -17,7 +15,6 @@ async function fetchCurrentUser() {
   });
 
   if (!res.ok) {
-    console.error("Fetch /me failed:", res.status, await res.text());
     throw new Error("Unauthorized");
   }
 
@@ -26,35 +23,27 @@ async function fetchCurrentUser() {
   return data;
 }
 
-/**
- * Logout request
- */
-// async function logoutRequest() {
-//   const token = localStorage.getItem("ACCESS_TOKEN");
-//   if (token) {
-//     await fetch(`${API_URL}/logout`, {
-//       method: "POST",
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//   }
+// ✅ Logout
+async function logoutRequest() {
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  if (token) {
+    await fetch(`${API_URL}/logout`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+  localStorage.removeItem("ACCESS_TOKEN");
+}
 
-//   localStorage.removeItem("ACCESS_TOKEN");
-// }
-
-/**
- * ✅ Main useAuth Hook
- */
 export function useAuth() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [loading, setLoading] = React.useState(true);
 
-  // Fetch current user
   const {
     data: userData,
     isLoading: userLoading,
     isError,
-    refetch,
   } = useQuery({
     queryKey: ["authUser"],
     queryFn: fetchCurrentUser,
@@ -80,23 +69,22 @@ export function useAuth() {
   };
 
   const user = userData?.user || null;
-  const roles = userData?.roles || (user?.role ? [user.role] : []);
-  const hasRole = (role) => roles.includes(role);
-  const isAdmin = hasRole("admin");
-  const isManager = hasRole("manager") || isAdmin;
-  const isStaff = roles.some((r) => ["admin", "manager", "sales_agent"].includes(r));
+  const role = user?.role || "guest";
 
   return {
     user,
-    session: userData,
+    role,
     loading,
     signOut,
-    roles,
-    hasRole,
-    isAdmin,
-    isManager,
-    isStaff,
-    refetch,
     isError,
+    isAdmin: role === "admin",
+    isManager: role === "manager",
+    isSalesAgent: role === "sales_agent",
+    isUser: role === "user",
   };
 }
+
+
+
+
+

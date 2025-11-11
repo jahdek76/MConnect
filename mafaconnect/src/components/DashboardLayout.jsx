@@ -30,9 +30,9 @@ import {
 import { Button } from "@/components/uimain/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/uimain/sheet";
 import { Badge } from "@/components/uimain/Badge";
-import { useAuth } from "@/hookss/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
-import { useTheme } from "@/hookss/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import { useConversations } from "@/hooks/useConversations";
 import { LowStockAlert } from "./LowStockAlert";
 import { ShoppingCartSidebar } from "./ShoppingCartSidebar";
@@ -71,12 +71,12 @@ const customerNavigation = [
 export function DashboardLayout({ children }) {
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
-  const { user, loading, signOut, roles, isManager, isAdmin, isStaff } = useAuth();
+  const { user, loading, signOut, roles, isManager, isAdmin, isStaff,role } = useAuth();
   const { isOnline } = useOfflineSync();
   const { theme, toggleTheme } = useTheme();
   const { getUnreadCount } = useConversations();
   const [accountNumber, setAccountNumber] = React.useState("");
-
+  console.log("✅ Auth data:", { user, roles });
   React.useEffect(() => {
     // Dummy API call simulation — replace with your Node API later
     const fetchAccountNumber = async () => {
@@ -225,13 +225,27 @@ export function DashboardLayout({ children }) {
             </div>
 
             <div className="pt-4 border-t">
-              <div className="mb-3 flex flex-wrap gap-1">
+              {/* <div className="mb-3 flex flex-wrap gap-1">
                 {roles.map((role) => (
                   <Badge key={role} variant="secondary" className="text-xs">
                     {role}
                   </Badge>
                 ))}
-              </div>
+              </div> */}
+              <div className="mb-3 flex flex-wrap gap-1">
+  {(Array.isArray(roles) && roles.length > 0
+    ? roles
+    : [role || user?.role || "guest"]
+  ).map((r) => (
+    <Badge
+      key={r}
+      variant={r === "admin" ? "secondary" : "destructive"}
+      className="text-xs capitalize"
+    >
+      {r}
+    </ Badge>
+  ))}
+</div>
               {accountNumber && (
                 <div className="text-xs font-semibold text-primary mb-2 p-2 bg-primary/5 rounded">
                   MFC-{accountNumber}
