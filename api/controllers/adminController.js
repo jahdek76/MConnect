@@ -153,6 +153,45 @@ exports.getDashboard = async (req, res) => {
 };
 
 
+// Generate a unique account number
+function generateAccountNumber() {
+  const random = Math.floor(10000000 + Math.random() * 90000000);
+  return random.toString(); // e.g. "82643109"
+}
+
+// ✅ Admin approves user
+exports.approveUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.kyc_status === "approved") {
+      return res.status(400).json({ message: "User already approved" });
+    }
+
+    user.kyc_status = "approved";
+    user.account_number = generateAccountNumber();
+    await user.save();
+
+    res.json({
+      message: "✅ User approved successfully",
+      account_number: user.account_number,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        kyc_status: user.kyc_status,
+      },
+    });
+  } catch (err) {
+    console.error("Approve error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // const bcrypt = require("bcrypt");
 // const jwt = require("jsonwebtoken");
 // const { User } = require("../models/user"); // your user model

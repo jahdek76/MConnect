@@ -2,16 +2,6 @@ import React from "react";
 import { Card, CardContent } from "@/components/uimain/card";
 import { cn } from "@/lib/utils";
 
-/**
- * MetricCard Component (JavaScript version)
- * Props:
- * - title: string
- * - value: string | number
- * - change: string (optional)
- * - changeType: "positive" | "negative" | "neutral"
- * - Icon: LucideIcon (React component)
- * - iconColor: string (Tailwind text color class)
- */
 export function MetricCard({
   title,
   value,

@@ -35,77 +35,43 @@ export default function Auth() {
 
   const API_URL = import.meta.env.VITE_HOME_OO;
 
-  // ✅ LOGIN
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-
-  // try {
-  //   const res = await axios.post(`http://localhost:8000/api/admin/login`, {
-  //     account_number: loginEmail,
-  //     password: loginPassword,
-  //   });
-
-  //   if (res.data.accessToken) {
-  //     localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
-  //     console.log(res.data.accessToken)
-  //     toast({
-  //       title: "✅ Login Successful",
-  //       description: `Welcome back, ${res.data.admin?.name || "User"}`,
-  //     });
-  //     navigate("/admin"); // redirect to dashboard or portal
-  //   } else {
-  //     throw new Error("Invalid response from server");
-  //   }
-  // } catch (err) {
-  //   toast({
-  //     title: "Login Failed",
-  //     description: err.response?.data?.message || err.message,
-  //     variant: "destructive",
-  //   });
-  // } finally {
-  //   setLoading(false);
-  // }
-  // };
- 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const res = await axios.post(`${API_URL}/login`, {
-      account_number: loginEmail,
-      password: loginPassword,
-    });
-
-    if (res.data.accessToken) {
-      localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
-
-      toast({
-        title: "✅ Login Successful",
-        description: `Welcome back, ${res.data.admin?.name || "User"}`,
+    try {
+      const res = await axios.post(`${API_URL}/login`, {
+        account_number: loginEmail,
+        password: loginPassword,
       });
 
-      // Redirect based on role
-      const role = res.data.admin?.role || "user";
-      if (role === "admin") navigate("/admin");
-      else if (role === "manager") navigate("/manager");
-      else if (role === "sales_agent") navigate("/sales");
-      else navigate("/portal");
-    } else {
-      throw new Error("Invalid response from server");
-    }
-  } catch (err) {
-    toast({
-      title: "❌ Login failed",
-      description: err.response?.data?.message || err.message,
-      variant: "destructive",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      if (res.data.accessToken) {
+        localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
 
+        toast({
+          title: "✅ Login Successful",
+          description: `Welcome back, ${res.data.admin?.name || "User"}`,
+        });
+
+        // Redirect based on role
+        const role = res.data.admin?.role || "user";
+        if (role === "admin") navigate("/admin");
+        else if (role === "manager") navigate("/manager");
+        else if (role === "sales_agent") navigate("/sales");
+        else navigate("/portal");
+      } else {
+        throw new Error("Invalid response from server");
+      }
+    } catch (err) {
+      toast({
+        title: "❌ Login failed",
+        description: err.response?.data?.message || err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ✅ SIGNUP
   const handleSignup = async (e) => {

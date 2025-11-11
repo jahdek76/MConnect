@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
+const customer_bussiness=  require("./routes/customer_bussiness.js");
 dotenv.config();
 const app = express();
 
@@ -19,7 +20,8 @@ app.use(
 );
 
 // ✅ API routes
-app.use("/api/admin", adminRoutes);
+app.use("/api/v1", adminRoutes);
+app.use("/api/v1", customer_bussiness);
 
 app.get("/", (req, res) => res.send("🚀 MafaConnect Backend is running..."));
 
