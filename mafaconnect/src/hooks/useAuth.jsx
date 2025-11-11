@@ -2,29 +2,28 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-/**
- * API Base URL
- * Make sure your .env file has:
- * VITE_HOME_OO="https://your-backend-domain.com/api"
- */
-const API_URL = import.meta.env.VITE_HOME_OO 
-/**
- * Fetch the currently authenticated user
- */
+const API_URL = import.meta.env.VITE_HOME_OO; // e.g. http://localhost:8000/api
+
+// ✅ Fetch the current user
 async function fetchCurrentUser() {
   const token = localStorage.getItem("ACCESS_TOKEN");
   if (!token) throw new Error("No token");
+
   const res = await fetch(`${API_URL}/me`, {
-    headers: { Authorization: `Bearer ${token}` },credentials: "include",
+    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 
-  if (!res.ok) throw new Error("Unauthorized");
-  return res.json();
+  if (!res.ok) {
+    throw new Error("Unauthorized");
+  }
+
+  const data = await res.json();
+  console.log("✅ /me response:", data);
+  return data;
 }
 
-/**
- * Logout request
- */
+// ✅ Logout
 async function logoutRequest() {
   const token = localStorage.getItem("ACCESS_TOKEN");
   if (token) {
@@ -33,25 +32,18 @@ async function logoutRequest() {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
-
   localStorage.removeItem("ACCESS_TOKEN");
 }
 
-/**
- * ✅ Main useAuth Hook
- * Handles user session, role checks, and logout
- */
 export function useAuth() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [loading, setLoading] = React.useState(true);
 
-  // Fetch current user using React Query
   const {
     data: userData,
     isLoading: userLoading,
     isError,
-    refetch,
   } = useQuery({
     queryKey: ["authUser"],
     queryFn: fetchCurrentUser,
@@ -59,7 +51,6 @@ export function useAuth() {
     enabled: !!localStorage.getItem("ACCESS_TOKEN"),
   });
 
-  // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSuccess: () => {
@@ -77,32 +68,143 @@ export function useAuth() {
     await logoutMutation.mutateAsync();
   };
 
-  // Extract user + roles from backend
-  const user = userData?.user || userData?.admin || null;
-  const roles =
-    userData?.roles ||
-    (user?.role ? [user.role] : []); // handle single-role users too
-
-  // Role helpers
-  const hasRole = (role) => roles.includes(role);
-  const isAdmin = hasRole("admin");
-  const isManager = hasRole("manager") || isAdmin;
-  const isStaff = roles.some((r) => ["admin", "manager", "sales_agent"].includes(r));
+  const user = userData?.user || null;
+  const role = user?.role || "guest";
 
   return {
     user,
-    session: userData,
+    role,
     loading,
     signOut,
-    roles,
-    hasRole,
-    isAdmin,
-    isManager,
-    isStaff,
-    refetch,
     isError,
+    isAdmin: role === "admin",
+    isManager: role === "manager",
+    isSalesAgent: role === "sales_agent",
+    isUser: role === "user",
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+// /**
+//  * API Base URL
+//  */
+// const API_URL = import.meta.env.VITE_HOME_OO;
+
+// async function fetchCurrentUser() {
+//   const token = localStorage.getItem("ACCESS_TOKEN");
+//   if (!token) throw new Error("No token");
+
+//   const res = await fetch(`${API_URL}/auth/me`, {
+//     headers: { Authorization: `Bearer ${token}` },
+//     credentials: "include",
+//   });
+
+//   if (!res.ok) {
+//     console.error("Fetch /me failed:", res.status, await res.text());
+//     throw new Error("Unauthorized");
+//   }
+
+//   const data = await res.json();
+//   console.log("✅ /me response:", data);
+//   return data;
+// }
+
+// /**
+//  * Logout request
+//  */
+// async function logoutRequest() {
+//   const token = localStorage.getItem("ACCESS_TOKEN");
+//   if (token) {
+//     await fetch(`${API_URL}/logout`, {
+//       method: "POST",
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+//   }
+
+//   localStorage.removeItem("ACCESS_TOKEN");
+// }
+
+// /**
+//  * ✅ Main useAuth Hook
+//  */
+// export function useAuth() {
+//   const navigate = useNavigate();
+//   const queryClient = useQueryClient();
+//   const [loading, setLoading] = React.useState(true);
+
+//   // Fetch current user
+//   const {
+//     data: userData,
+//     isLoading: userLoading,
+//     isError,
+//     refetch,
+//   } = useQuery({
+//     queryKey: ["authUser"],
+//     queryFn: fetchCurrentUser,
+//     retry: false,
+//     enabled: !!localStorage.getItem("ACCESS_TOKEN"),
+//   });
+
+//   const logoutMutation = useMutation({
+//     mutationFn: logoutRequest,
+//     onSuccess: () => {
+//       queryClient.removeQueries(["authUser"]);
+//       localStorage.removeItem("ACCESS_TOKEN");
+//       navigate("/auth");
+//     },
+//   });
+
+//   React.useEffect(() => {
+//     if (!userLoading) setLoading(false);
+//   }, [userLoading]);
+
+//   const signOut = async () => {
+//     await logoutMutation.mutateAsync();
+//   };
+
+//   const user = userData?.user || null;
+//   const roles = userData?.roles || (user?.role ? [user.role] : []);
+//   const hasRole = (role) => roles.includes(role);
+//   const isAdmin = hasRole("admin");
+//   const isManager = hasRole("manager") || isAdmin;
+//   const isStaff = roles.some((r) => ["admin", "manager", "sales_agent"].includes(r));
+
+//   return {
+//     user,
+//     session: userData,
+//     loading,
+//     signOut,
+//     roles,
+//     hasRole,
+//     isAdmin,
+//     isManager,
+//     isStaff,
+//     refetch,
+//     isError,
+//   };
+// }
 
 
 

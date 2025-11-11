@@ -8,3 +8,10 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((regs) => {
+    for (const reg of regs) reg.unregister();
+  });
+  caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
+  console.log("🧹 Service Worker cleared & disabled for dev mode");
+}

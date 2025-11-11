@@ -4,7 +4,6 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
-
 dotenv.config();
 const app = express();
 
@@ -14,7 +13,7 @@ app.use(cookieParser());
 // ✅ Allow both localhost variants
 app.use(
   cors({
-    origin: ["http://localhost:8081", "http://127.0.0.1:8081"],
+    origin: ["http://localhost:8080", "http://127.0.0.1:8080"],
     credentials: true,
   })
 );

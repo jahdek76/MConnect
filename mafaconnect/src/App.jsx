@@ -331,16 +331,58 @@ function App() {
               </ProtectedRoute>
             }
           /> */}
-          <Route
+          {/* <Route
             path="/admin"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayout>
                   <Admin />
-                </DashboardLayout>
+               </DashboardLayout>
               </ProtectedRoute>
             }
-          />
+          /> */}
+
+          <Route
+  path="/admin"
+  element={
+    <ProtectedRoute requireAdmin>
+      <DashboardLayout>
+        <Admin />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
+
+{/* <Route
+  path="/manager"
+  element={
+    <ProtectedRoute requireManager>
+      <DashboardLayout>
+        <ManagerDashboard />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/sales"
+  element={
+    <ProtectedRoute requireSalesAgent>
+      <DashboardLayout>
+        <SalesAgentDashboard />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/> */}
+
+{/* <Route
+  path="/portal"
+  element={
+    <ProtectedRoute>
+      <UserPortal />
+    </ProtectedRoute>
+  }
+/> */}
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

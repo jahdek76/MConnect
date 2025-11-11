@@ -4,49 +4,55 @@ const { User } = require("../models/user");
 require("dotenv").config();
 
 /**
- * Helper to generate access token
+ * 🔐 Helper to generate access token
  */
 const generateAccessToken = (user) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error("Missing JWT_ACCESS_SECRET");
   return jwt.sign(
     { id: user.id, role: user.role, account_number: user.account_number },
     process.env.JWT_ACCESS_SECRET,
-    { expiresIn: "15m" } // short expiry for security
+    { expiresIn: "9d" }
   );
 };
 
 /**
- * Helper to generate refresh token
+ * 🔐 Helper to generate refresh token
  */
 const generateRefreshToken = (user) => {
+  if (!process.env.JWT_REFRESH_SECRET) throw new Error("Missing JWT_REFRESH_SECRET");
   return jwt.sign(
     { id: user.id, role: user.role },
     process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" } // lasts 7 days
+    { expiresIn: "7d" }
   );
 };
 
-// ✅ Admin Login
+/**
+ * ✅ Admin Login
+ */
 exports.adminLogin = async (req, res) => {
   try {
     const { account_number, password } = req.body;
+
+    // Find admin
     const admin = await User.findOne({ where: { account_number, role: "admin" } });
-
     if (!admin) return res.status(401).json({ message: "Invalid admin credentials" });
-    if (!admin.is_active)
-      return res.status(403).json({ message: "Admin account inactive" });
+    if (!admin.is_active) return res.status(403).json({ message: "Admin account inactive" });
 
+    // Verify password
     const valid = await bcrypt.compare(password, admin.password);
     if (!valid) return res.status(401).json({ message: "Incorrect password" });
 
+    // Generate tokens
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin);
 
-    // 🍪 Store refresh token securely in HTTP-only cookie
+    // Store refresh token in secure cookie
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({
@@ -60,12 +66,14 @@ exports.adminLogin = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("Login error:", err.message);
     res.status(500).json({ message: "Server error during login" });
   }
 };
 
-// ✅ Fetch current user
+/**
+ * ✅ Get Current User
+ */
 exports.getCurrentUser = async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
@@ -82,17 +90,22 @@ exports.getCurrentUser = async (req, res) => {
 
     res.json({ user });
   } catch (err) {
-    console.error("Get user error:", err);
+    console.error("Get user error:", err.message);
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    }
     res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
-// ✅ Refresh Access Token using cookie
+/**
+ * ✅ Refresh Access Token using cookie
+ */
 exports.refreshToken = (req, res) => {
-  const token = req.cookies.refresh_token;
-  if (!token) return res.status(401).json({ message: "No refresh token provided" });
-
   try {
+    const token = req.cookies.refresh_token;
+    if (!token) return res.status(401).json({ message: "No refresh token provided" });
+
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 
     const newAccessToken = jwt.sign(
@@ -103,18 +116,26 @@ exports.refreshToken = (req, res) => {
 
     res.json({ accessToken: newAccessToken });
   } catch (err) {
-    console.error("Refresh error:", err);
+    console.error("Refresh error:", err.message);
     res.status(403).json({ message: "Invalid or expired refresh token" });
   }
 };
 
-// ✅ Logout
+/**
+ * ✅ Logout
+ */
 exports.logout = async (req, res) => {
-  res.clearCookie("refresh_token", { httpOnly: true, sameSite: "lax", secure: false });
+  res.clearCookie("refresh_token", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
   return res.status(200).json({ message: "Logged out successfully" });
 };
 
-// ✅ Admin Dashboard (sample)
+/**
+ * ✅ Admin Dashboard (sample)
+ */
 exports.getDashboard = async (req, res) => {
   try {
     const totalUsers = await User.count();
@@ -126,7 +147,7 @@ exports.getDashboard = async (req, res) => {
       stats: { totalUsers, pendingKyc, approvedKyc },
     });
   } catch (err) {
-    console.error("Dashboard error:", err);
+    console.error("Dashboard error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };

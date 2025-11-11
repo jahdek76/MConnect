@@ -7,23 +7,14 @@ const {
   logout,
   getDashboard,
 } = require("../controllers/adminController");
+const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 
 router.post("/login", adminLogin);
-router.get("/auth/me", getCurrentUser);
+router.get("/me", authenticate, requireRole("admin"), getCurrentUser);
 router.post("/refresh", refreshToken);
 router.post("/logout", logout);
-router.get("/dashboard", getDashboard);
+// Only admins can access dashboard
+router.get("/dashboard", authenticate, requireRole("admin"), getDashboard);
+// router.get("/dashboard", getDashboard);
 
 module.exports = router;
-
-// const express = require("express");
-// const router = express.Router();
-// const { adminLogin, getDashboard ,logout, getCurrentUser} = require("../controllers/adminController");
-
-
-// // Admin login route
-// router.post("/login", adminLogin);
-// router.get("/me", getCurrentUser);
-// router.post("/logout", logout);
-
-// module.exports = router;

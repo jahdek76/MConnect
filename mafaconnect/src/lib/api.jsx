@@ -2,8 +2,7 @@
 import axios from "axios";
 
 // 🧠 Base URL of your Node.js backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://your-node-backend.com"; 
-// you can set VITE_API_BASE_URL in your .env file
+const API_BASE_URL = import.meta.env.VITE_HOME_OO
 
 // Axios instance
 export const api = axios.create({

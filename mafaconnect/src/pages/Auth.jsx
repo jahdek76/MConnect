@@ -4,7 +4,13 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/hooks/useTheme";
@@ -27,40 +33,79 @@ export default function Auth() {
   const [customerType, setCustomerType] = useState("individual");
   const [resetEmail, setResetEmail] = useState("");
 
-  const API_URL =  import.meta.env.VITE_HOME_OO 
+  const API_URL = import.meta.env.VITE_HOME_OO;
 
   // ✅ LOGIN
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  // try {
+  //   const res = await axios.post(`http://localhost:8000/api/admin/login`, {
+  //     account_number: loginEmail,
+  //     password: loginPassword,
+  //   });
+
+  //   if (res.data.accessToken) {
+  //     localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
+  //     console.log(res.data.accessToken)
+  //     toast({
+  //       title: "✅ Login Successful",
+  //       description: `Welcome back, ${res.data.admin?.name || "User"}`,
+  //     });
+  //     navigate("/admin"); // redirect to dashboard or portal
+  //   } else {
+  //     throw new Error("Invalid response from server");
+  //   }
+  // } catch (err) {
+  //   toast({
+  //     title: "Login Failed",
+  //     description: err.response?.data?.message || err.message,
+  //     variant: "destructive",
+  //   });
+  // } finally {
+  //   setLoading(false);
+  // }
+  // };
+ 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const res = await axios.post(`${API_URL}/login`, {
-        account_number: loginEmail,
-        password: loginPassword,
-      });
+  try {
+    const res = await axios.post(`${API_URL}/login`, {
+      account_number: loginEmail,
+      password: loginPassword,
+    });
 
-      if (res.data.accessToken) {
-        localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
-        console.log(res.data.accessToken)
-        toast({
-          title: "✅ Login Successful",
-          description: `Welcome back, ${res.data.admin?.name || "User"}`,
-        });
-        navigate("/admin"); // redirect to dashboard or portal
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (err) {
+    if (res.data.accessToken) {
+      localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
+
       toast({
-        title: "Login Failed",
-        description: err.response?.data?.message || err.message,
-        variant: "destructive",
+        title: "✅ Login Successful",
+        description: `Welcome back, ${res.data.admin?.name || "User"}`,
       });
-    } finally {
-      setLoading(false);
+
+      // Redirect based on role
+      const role = res.data.admin?.role || "user";
+      if (role === "admin") navigate("/admin");
+      else if (role === "manager") navigate("/manager");
+      else if (role === "sales_agent") navigate("/sales");
+      else navigate("/portal");
+    } else {
+      throw new Error("Invalid response from server");
     }
-  };
+  } catch (err) {
+    toast({
+      title: "❌ Login failed",
+      description: err.response?.data?.message || err.message,
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // ✅ SIGNUP
   const handleSignup = async (e) => {
@@ -107,7 +152,8 @@ export default function Auth() {
 
       toast({
         title: "📧 Reset Email Sent",
-        description: res.data.message || "Check your inbox for reset instructions.",
+        description:
+          res.data.message || "Check your inbox for reset instructions.",
       });
       setResetEmail("");
     } catch (err) {
@@ -129,7 +175,11 @@ export default function Auth() {
         onClick={toggleTheme}
         className="fixed top-4 right-4"
       >
-        {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+        {theme === "light" ? (
+          <Moon className="h-5 w-5" />
+        ) : (
+          <Sun className="h-5 w-5" />
+        )}
       </Button>
 
       <Card className="w-full max-w-md shadow-elegant">
