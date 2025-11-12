@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
-const cookieParser = require("cookie-parser");
+// const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
@@ -10,7 +10,7 @@ dotenv.config();
 
 
 app.use(express.json());
-app.use(cookieParser());
+// app.use(cookieParser());
 
 // ✅ Allow both localhost variants
 app.use(
