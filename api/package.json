@@ -27,6 +27,7 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
+    "cookie-parser": "^1.4.6",
     "eslint": "^9.39.1",
     "nodemon": "^3.1.10"
   }
