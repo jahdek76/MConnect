@@ -19,7 +19,7 @@ async function fetchCurrentUser() {
   }
 
   const data = await res.json();
-  console.log("✅ /me response:", data);
+  console.log("/me response:", data);
   return data;
 }
 
