@@ -1,11 +1,9 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/uimain/card";
+import { Card } from "@/components/uisbefore/Card";
+import { CardContent } from "@/components/uisbefore/Card";
+import { CardHeader } from "@/components/uisbefore/Card";
+import { CardTitle } from "@/components/uisbefore/Card";
+import { CardDescription } from "@/components/uisbefore/Card";
 import { Input } from "@/components/uimain/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/uimain/Badge";

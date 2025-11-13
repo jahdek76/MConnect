@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2, Moon, Sun, Eye, EyeOff } from "lucide-react";
 import mafaLogo from "../assets/mafa-logo.png";
 
-// Replace these with your local components or use HTML equivalents
-// import { Button } from "../components/Button";
-// import { Input } from "../components/Input";
-// import { Label } from "../components/Label";
+
 
 import { Button } from "@/components/uisbefore/Button";
 import { Input } from "@/components/uisbefore/Input";

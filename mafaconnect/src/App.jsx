@@ -3,42 +3,10 @@ import Toaster from "@/components/ui/Toaster";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import { DashboardLayout } from "./components/DashboardLayout";
 import { InstallPromptBanner } from "./components/InstallPromptBanner";
-// import { CustomerProtectedRoute } from "./components/CustomerProtectedRoute";
-// import { AuthProtectedRoute } from "./components/AuthProtectedRoute";
-
-// import Dashboard from "./pages/Dashboard";
-// import CustomerDashboard from "./pages/CustomerDashboard";
-// import CustomerOrders from "./pages/CustomerOrders";
-// import CustomerInvoices from "./pages/CustomerInvoices";
-// import Sales from "./pages/Sales";
-// import Transactions from "./pages/Transactions";
-// import Products from "./pages/Products";
-// import Customers from "./pages/Customers";
-// import Loyalty from "./pages/Loyalty";
-// import Analytics from "./pages/Analytics";
-// import Invoices from "./pages/Invoices";
-// import Returns from "./pages/Returns";
-// import Locations from "./pages/Locations";
-// import LocationDetail from "./pages/LocationDetail";
-// import Suppliers from "./pages/Suppliers";
-// import PurchaseOrders from "./pages/PurchaseOrders";
-// import StockTransfers from "./pages/StockTransfers";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
-// import CustomerPortal from "./pages/CustomerPortal";
-// import ProfileSettings from "./pages/ProfileSettings";
-// import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
-// import Shop from "./pages/Shop";
-// import ProductDetail from "./pages/ProductDetail";
-// import Cart from "./pages/Cart";
-// import Checkout from "./pages/Checkout";
-// import OrderConfirmation from "./pages/OrderConfirmation";
-// import OrderTracking from "./pages/OrderTracking";
-// import CustomerOrderManagement from "./pages/CustomerOrderManagement";
-// import KYCOnboarding from "./pages/KYCOnboarding";
 import Install from "./pages/Install";
 import CustomerPortal from "./pages/CustomerPortal";
 import { DashboardLayout } from "./components/DashboardLayout";
@@ -57,7 +25,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/portal" element={<CustomerPortal />} />
           <Route path="/install" element={<Install />} />
- <Route
+          <Route
             path="/customer-dashboard"
             element={
               <CustomerProtectedRoute>
